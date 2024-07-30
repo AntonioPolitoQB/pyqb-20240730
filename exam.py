@@ -17,7 +17,7 @@
 #
 # You can solve the exercises below by using standard Python 3.11 libraries, NumPy, Matplotlib, Pandas, PyMC.
 # You can browse the documentation: [Python](https://docs.python.org/3.11/), [NumPy](https://numpy.org/doc/1.26/index.html), [Matplotlib](https://matplotlib.org/3.8.2/users/index.html), [Pandas](https://pandas.pydata.org/pandas-docs/version/2.1/index.html), [PyMC](https://www.pymc.io/projects/docs/en/v5.10.3/api.html).
-# You can also look at the slides or your code on [GitHub](https://github.com). 
+# You can also look at the slides or your code on [GitHub](https://github.com).
 #
 # **It is forbidden to communicate with others or "ask questions" online (i.e., stackoverflow is ok if the answer is already there, but you cannot ask a new question or use ChatGPT or similar products)**
 #
@@ -37,7 +37,7 @@ import arviz as az              # type: ignore
 
 # ### Exercise 1 (max 2 points)
 #
-# The file [mice.csv](./mice.csv) (source: https://archive.ics.uci.edu/ml/datasets/Mice+Protein+Expression) contains the expression levels of 77 proteins/protein modifications that produced detectable signals in the nuclear fraction of cortex. 
+# The file [mice.csv](./mice.csv) (source: https://archive.ics.uci.edu/ml/datasets/Mice+Protein+Expression) contains the expression levels of 77 proteins/protein modifications that produced detectable signals in the nuclear fraction of cortex.
 # The eight classes of mice are described based on features such as genotype, behavior and treatment. According to genotype, mice can be control or trisomic. According to behavior, some mice have been stimulated to learn (context-shock) and others have not (shock-context) and in order to assess the effect of the drug memantine in recovering the ability to learn in trisomic mice, some mice have been injected with the drug and others have not.
 #
 # Load the data in a pandas dataframe using the `MouseID` column as the index.
@@ -79,7 +79,7 @@ fig.tight_layout()
 
 # ### Exercise 4 (max 5 points)
 #
-# Make a (huge) figure with the histograms plotted in the previous exercise for all the proteins whose name starts with 'p' (there are 22 such columns), each in a different row of the figure (the figure will have 2 columns and 22 rows; to make it readable set the `figsize` to `(5, 3*22)`). 
+# Make a (huge) figure with the histograms plotted in the previous exercise for all the proteins whose name starts with 'p' (there are 22 such columns), each in a different row of the figure (the figure will have 2 columns and 22 rows; to make it readable set the `figsize` to `(5, 3*22)`).
 #
 
 # +
@@ -99,31 +99,29 @@ fig.tight_layout()
 
 # ### Exercise 5 (max 7 points)
 #
-# Define a function `evodd_digits` that takes a float number and an even/odd flag: when the flag is True, the function should return all the even digits of the decimal representation of the number, otherwise it returns the odd ones. For example, if the number is 1.2345 and the flag is True, the function should return 24.  Think carefully about which return type is the most appropriate. 
+# Define a function `evodd_digits` that takes a float number and an even/odd flag: when the flag is True, the function should return all the even digits of the decimal representation of the number, otherwise it returns the odd ones. For example, if the number is 1.2345 and the flag is True, the function should return 24.  Think carefully about which return type is the most appropriate.
 #
 # To get the full marks, you should declare correctly type hints and add a test within a doctest string.
 
 def evodd_digits(x: float, even: bool = True) -> str:
     """Return all the even (or odd if even is False) digits of the decimal representation of the number x.
-    
+
     >>> evodd_digits(1.2345)
     '24'
 
-    >>> evodd_digits(1.2345, False)
+    >>> evodd_digits(1.2345, even = False)
     '135'
 
     >>> evodd_digits(0.2345)
     '024'
-    
+
     """
     ris = ''
-    for c in [d for d in str(x) if d.isnumeric()]:
+    for c in (d for d in str(x) if d.isnumeric()):
         if even and int(c) % 2 == 0:
             ris += c
         elif not even and int(c) % 2 != 0:
             ris += c
-        else:
-            pass
     return ris
 
 
@@ -172,20 +170,19 @@ fig.tight_layout()
 #
 # Consider this statistical model:
 #
-# - a parameter $\alpha$ is normally distributed with $\mu = 0$ and $\sigma = 0.2$ 
-# - a parameter $\beta$ is normally distributed with $\mu = 0$ and $\sigma = 0.5$ 
+# - a parameter $\alpha$ is normally distributed with $\mu = 0$ and $\sigma = 0.2$
+# - a parameter $\beta$ is normally distributed with $\mu = 0$ and $\sigma = 0.5$
 # - a parameter $\gamma$ is exponentially distributed with $\lambda = 1$
 # - the observed standardized `Tau_N` for class 't-CS-s' is normally distributed with standard deviation $\gamma$ and a mean given by $\alpha + \beta \cdot M$ (where $M$ is the correspondig value of standardized `Bcatenin_N` for class 't-CS-s').
 #
-# Code this model with pymc, sample the model, and print the summary of the resulting estimation by using `az.summary`. 
+# Code this model with pymc, sample the model, and print the summary of the resulting estimation by using `az.summary`.
 
 with pm.Model() as model:
     a = pm.Normal('alpha', mu=0, sigma=0.2)
     b = pm.Normal('beta', mu=0, sigma=0.5)
-    l = pm.Exponential('sigma', 1)
+    g = pm.Exponential('gamma', 1)
 
-    pm.Normal("t", mu=a+b*xd, sigma=l, observed=yd)
+    pm.Normal("t", mu=a+b*xd, sigma=g, observed=yd)
 
     idata = pm.sample()
 az.summary(idata)
-
